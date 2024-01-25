@@ -110,9 +110,9 @@ _Follow the next steps_
    ```sh
    npm install
    ```
-3. Run projecto
+3. Run project
    ```sh
-   npm run
+   npm run dev
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -123,10 +123,10 @@ _Follow the next steps_
 ## Usage
 
 Controls:
-* Arrow down: The piece goes down.
-* Arrow left: The piece goes to the left.
-* Arrow right: The piece goes to the right.
-* Arrow up: The piece rotates to the right.
+<i class="fa-solid fa-arrow-down"></i> Arrow down: The piece goes down.
+<i class="fa-solid fa-arrow-left"></i> Arrow left: The piece goes to the left.
+<i class="fa-solid fa-arrow-right"></i> Arrow right: The piece goes to the right.
+<i class="fa-solid fa-arrow-up"></i> Arrow up: The piece rotates to the right.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
