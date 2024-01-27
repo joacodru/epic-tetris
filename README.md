@@ -71,6 +71,14 @@ I started this project with a litle bit of inspiration provided by one famous de
 Features:
 * Pure JavaScript: No external libraries or frameworks were used.
 * Intuitive Controls: Effortless controls for a seamless gaming experience. Use arrow keys to move and rotate pieces.
+* The scoring system was made inspired by the Nintendo original scoring system and is the following
+
+Scoring system
+- 1 line removed => 40 * (level + 1)
+- 2 lines removed => 100 * (level + 1)
+- 3 lines removed => 300 * (level + 1)
+- 4 lines removed => 1200 * (level + 1)
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -137,7 +145,8 @@ Controls:
 
 - [x] Add MaxScore
 - [ ] Add Changelog
-- [ ] Add levels and level display
+- [x] Adjust score calculation
+- [x] Add levels and level display
 - [ ] Support for Multiplayer
 - [ ] Add Animations
 
