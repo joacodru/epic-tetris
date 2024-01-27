@@ -160,7 +160,7 @@ See the [open issues](https://github.com/joacodru/epic-tetris/issues) for a full
 
 Joaquín Druetta - joadruetta@gmail.com
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/joacodru/epic-tetris)
+Project Link: [https://github.com/joacodru/epic-tetris](https://github.com/joacodru/epic-tetris)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
