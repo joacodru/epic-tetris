@@ -21,11 +21,7 @@ body {
   height: 100vh;
 }
 
-#score {
-  color: red;
-}
-
-#maxScore {
+span {
   color: red;
 }
 

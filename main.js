@@ -5,8 +5,6 @@ import { piece, colors, pieces, PIXEL, BOARD_WIDTH, BOARD_HEIGHT } from './const
 const canvas = document.querySelector('canvas')
 const context = canvas.getContext('2d')
 
-const music = new window.Audio('./tetris.mp3')
-
 canvas.width = BOARD_WIDTH * PIXEL
 canvas.height = BOARD_HEIGHT * PIXEL
 
@@ -16,17 +14,16 @@ const createBoard = (width, height) => {
   return Array(height).fill().map(() => Array(width).fill(0))
 }
 
-// !!Trying next piece
 let firstPiece = 0
 
 const nextPiece = document.querySelector('.nextPiece')
 const nextContext = nextPiece.getContext('2d')
 
-nextPiece.width = PIXEL * 7
+nextPiece.width = PIXEL * 6
 nextPiece.height = PIXEL * 4
 nextContext.scale(PIXEL, PIXEL)
 
-const nextBoard = createBoard(5, 6)
+const nextBoard = createBoard(6, 4)
 
 // board
 const board = createBoard(BOARD_WIDTH, BOARD_HEIGHT)
@@ -34,27 +31,32 @@ const board = createBoard(BOARD_WIDTH, BOARD_HEIGHT)
 // pieces
 
 function getRandomPiece () {
-  // TODO REFACTOR PLS
-  const randomNumber = Math.floor(Math.random() * pieces.length)
+  const getRandomNumber = () => Math.floor(Math.random() * pieces.length)
+
+  const setPiece = (targetPiece) => {
+    const randomIndex = getRandomNumber()
+    targetPiece.shape = pieces[randomIndex]
+    targetPiece.color = colors[randomIndex]
+  }
+
   if (!firstPiece) {
-    piece.shape = pieces[randomNumber]
-    piece.color = colors[randomNumber]
-    const scndRandomNumber = Math.floor(Math.random() * pieces.length)
-    nextPiece.shape = pieces[scndRandomNumber]
-    nextPiece.color = colors[scndRandomNumber]
+    setPiece(piece)
+    setPiece(nextPiece)
     firstPiece = 1
   } else {
     piece.shape = nextPiece.shape
     piece.color = nextPiece.color
-    nextPiece.shape = pieces[randomNumber]
-    nextPiece.color = colors[randomNumber]
+    setPiece(nextPiece)
   }
+
   nextPiece.position = { x: 1, y: 1 }
 }
 
 // points
 let score = 0
 let maxScore = 0
+let level = 0
+let lines = 0
 
 // game loop
 let dropCounter = 0
@@ -64,7 +66,7 @@ function update (time = 0) {
   const deltaTime = time - lastTime
   lastTime = time
 
-  dropCounter += deltaTime + (score / 100)
+  dropCounter += deltaTime + ((level + 1) * 3)
   const pieceDown = { x: piece.position.x, y: piece.position.y + 1 }
 
   if (dropCounter > 1000) {
@@ -82,71 +84,54 @@ function update (time = 0) {
 }
 
 function draw () {
-  // !!next piece canvas
-  nextContext.fillStyle = 'black'
-  nextContext.fillRect(0, 0, nextPiece.width, nextPiece.height)
-  nextBoard.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value) {
-        const gradient = context.createRadialGradient(x + 0.5, y + 0.5, 0, x + 0.5, y + 0.5, 1)
-        gradient.addColorStop(0.30, value)
-        gradient.addColorStop(1, 'black')
-        context.fillStyle = gradient
-        context.fillRect(x, y, 0.95, 0.95)
-      }
-    })
-  })
-  // To delete the white lines set next value BLACK
-  context.fillStyle = 'black'
-  context.fillRect(0, 0, canvas.width, canvas.height)
-  board.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value) {
-        // TODO refactor next values
-        context.fillStyle = 'black'
-        context.fillRect(x, y, 0.996, 0.996)
-        const gradient = context.createRadialGradient(x + 0.5, y + 0.5, 0, x + 0.5, y + 0.5, 1)
-        gradient.addColorStop(0.30, value)
-        gradient.addColorStop(1, 'black')
-        context.fillStyle = gradient
-        context.fillRect(x, y, 0.95, 0.95)
-      } else {
-        context.fillStyle = 'black'
-        context.fillRect(x, y, 0.996, 0.996)
-      }
-    })
-  })
+  const fillRectWithGradient = (ctx, x, y, width, height, color) => {
+    const gradient = ctx.createRadialGradient(x + 0.5, y + 0.5, 0, x + 0.5, y + 0.5, 1)
+    gradient.addColorStop(0.30, color)
+    gradient.addColorStop(1, 'black')
+    ctx.fillStyle = gradient
+    ctx.fillRect(x, y, width, height)
+  }
 
-  piece.shape.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value) {
-        // TODO refactor next values
-        const gradient = context.createRadialGradient(x + piece.position.x + 0.5, y + piece.position.y + 0.5, 0, x + piece.position.x + 0.5, y + piece.position.y + 0.5, 1)
-        gradient.addColorStop(0.30, piece.color)
-        gradient.addColorStop(1, 'black')
-        context.fillStyle = gradient
-        context.fillRect(x + piece.position.x, y + piece.position.y, 0.95, 0.95)
-      }
-    })
-  })
+  const drawBoard = (ctx, gameBoard) => {
+    ctx.fillStyle = 'black'
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-  // !! NXT PIECE
+    gameBoard.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value) {
+          fillRectWithGradient(ctx, x, y, 0.95, 0.95, value)
+        } else {
+          ctx.fillStyle = 'black'
+          ctx.fillRect(x, y, 0.996, 0.996)
+        }
+      })
+    })
+  }
+
+  // Draw next piece canvas
+  drawBoard(nextContext, nextBoard)
   nextPiece.shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        // TODO refactor next values
-        const gradient = nextContext.createRadialGradient(x + nextPiece.position.x + 0.5, y + nextPiece.position.y + 0.5, 0, x + nextPiece.position.x + 0.5, y + nextPiece.position.y + 0.5, 1)
-        gradient.addColorStop(0.30, nextPiece.color)
-        gradient.addColorStop(1, 'black')
-        nextContext.fillStyle = gradient
-        nextContext.fillRect(x + nextPiece.position.x, y + nextPiece.position.y, 0.95, 0.95)
+        fillRectWithGradient(nextContext, x + nextPiece.position.x, y + nextPiece.position.y, 0.95, 0.95, nextPiece.color)
+      }
+    })
+  })
+
+  // Draw current game board
+  drawBoard(context, board)
+
+  // Draw current piece
+  piece.shape.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value) {
+        fillRectWithGradient(context, x + piece.position.x, y + piece.position.y, 0.95, 0.95, piece.color)
       }
     })
   })
 }
 
-// predict colission
-
+// Predict colission
 function checkColission (movement) {
   const xPos = !movement ? piece.position.x : movement.x
   const yPos = !movement ? piece.position.y : movement.y
@@ -160,8 +145,7 @@ function checkColission (movement) {
   })
 }
 
-// solidify
-
+// Solidify piece
 function solidifyPiece () {
   piece.shape.forEach((row, y) => {
     row.forEach((value, x) => {
@@ -171,22 +155,23 @@ function solidifyPiece () {
     })
   })
 
-  // reset position & get new piece
+  // Reset position & get new piece
   piece.position.x = Math.floor(BOARD_WIDTH / 2 - 1)
   piece.position.y = 0
   getRandomPiece()
 
-  // game over
+  // Game over
   if (checkColission()) {
     window.alert('Game over!! Try again!')
     maxScore = Math.max(score, maxScore)
     score = 0
+    level = 0
+    lines = 0
     board.forEach((row) => row.fill(0))
   }
 }
 
-// remove rows
-
+// Remove rows
 function removeRows () {
   let removedRows = 0
   board.forEach((row, y) => {
@@ -197,11 +182,16 @@ function removeRows () {
       board.unshift(newRow)
     }
   })
-  // sum score
-  const multiplier = (2 ** (removedRows - 1))
-  const basePoints = 25
-  score = score + (removedRows * basePoints * multiplier)
+
+  // Summ score
+  lines = lines + removedRows
+  if (removedRows) {
+    score = score + ((removedRows === 1 ? 40 : removedRows === 2 ? 100 : removedRows === 3 ? 300 : 1200) * (level + 1))
+    level = Math.trunc(lines / 10)
+  }
   document.getElementById('score').textContent = score
+  document.getElementById('lines').textContent = lines
+  document.getElementById('level').textContent = level
   document.getElementById('maxScore').textContent = maxScore
 }
 
@@ -265,6 +255,4 @@ $section.addEventListener('click', () => {
   getRandomPiece()
   update()
   $section.remove()
-  music.volume = 0.5
-  // music.play()
 })
