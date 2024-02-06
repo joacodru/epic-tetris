@@ -1,5 +1,5 @@
 import './style.css'
-import { piece, colors, pieces, PIXEL, BOARD_WIDTH, BOARD_HEIGHT } from './consts'
+import { piece, colors, pieces, PIXEL, BOARD_WIDTH, BOARD_HEIGHT, NEXT_PIECE_WIDTH, NEXT_PIECE_HEIGHT } from './consts'
 
 // inicializacion de canvas
 const canvas = document.querySelector('canvas')
@@ -14,16 +14,16 @@ const createBoard = (width, height) => {
   return Array(height).fill().map(() => Array(width).fill(0))
 }
 
-let firstPiece = 0
+let firstPiece = false
 
 const nextPiece = document.querySelector('.nextPiece')
 const nextContext = nextPiece.getContext('2d')
 
-nextPiece.width = PIXEL * 6
-nextPiece.height = PIXEL * 4
+nextPiece.width = PIXEL * NEXT_PIECE_WIDTH
+nextPiece.height = PIXEL * NEXT_PIECE_HEIGHT
 nextContext.scale(PIXEL, PIXEL)
 
-const nextBoard = createBoard(6, 4)
+const nextBoard = createBoard(NEXT_PIECE_WIDTH, NEXT_PIECE_HEIGHT)
 
 // board
 const board = createBoard(BOARD_WIDTH, BOARD_HEIGHT)
@@ -42,7 +42,7 @@ function getRandomPiece () {
   if (!firstPiece) {
     setPiece(piece)
     setPiece(nextPiece)
-    firstPiece = 1
+    firstPiece = true
   } else {
     piece.shape = nextPiece.shape
     piece.color = nextPiece.color
@@ -61,15 +61,17 @@ let lines = 0
 // game loop
 let dropCounter = 0
 let lastTime = 0
+const deltaLimit = 1000
+const deltaMultiplier = 3
 
 function update (time = 0) {
   const deltaTime = time - lastTime
   lastTime = time
 
-  dropCounter += deltaTime + ((level + 1) * 3)
+  dropCounter += deltaTime + ((level + 1) * deltaMultiplier)
   const pieceDown = { x: piece.position.x, y: piece.position.y + 1 }
 
-  if (dropCounter > 1000) {
+  if (dropCounter > deltaLimit) {
     if (!checkColission(pieceDown)) {
       piece.position.y++
     } else {
@@ -82,10 +84,10 @@ function update (time = 0) {
   draw()
   window.requestAnimationFrame(update)
 }
-
+const gradienOffset = 0.5
 function draw () {
   const fillRectWithGradient = (ctx, x, y, width, height, color) => {
-    const gradient = ctx.createRadialGradient(x + 0.5, y + 0.5, 0, x + 0.5, y + 0.5, 1)
+    const gradient = ctx.createRadialGradient(x + gradienOffset, y + gradienOffset, 0, x + gradienOffset, y + gradienOffset, 1)
     gradient.addColorStop(0.30, color)
     gradient.addColorStop(1, 'black')
     ctx.fillStyle = gradient
@@ -172,6 +174,11 @@ function solidifyPiece () {
 }
 
 // Remove rows
+const singleLinePoints = 40
+const twoLinePoints = 100
+const threeLinePoints = 300
+const tetrisPoints = 1200
+const linesPerLevel = 10
 function removeRows () {
   let removedRows = 0
   board.forEach((row, y) => {
@@ -186,8 +193,8 @@ function removeRows () {
   // Summ score
   lines = lines + removedRows
   if (removedRows) {
-    score = score + ((removedRows === 1 ? 40 : removedRows === 2 ? 100 : removedRows === 3 ? 300 : 1200) * (level + 1))
-    level = Math.trunc(lines / 10)
+    score = score + ((removedRows === 1 ? singleLinePoints : removedRows === 2 ? twoLinePoints : removedRows === 3 ? threeLinePoints : tetrisPoints) * (level + 1))
+    level = Math.trunc(lines / linesPerLevel)
   }
   document.getElementById('score').textContent = score
   document.getElementById('lines').textContent = lines
@@ -210,14 +217,12 @@ function rotate () {
   }
   const previousShape = piece.shape
   piece.shape = rotated
-  // TODO If collission right x--
   if (checkColission()) {
     piece.shape = previousShape
   }
 }
 
 // capture the key pressed
-
 document.addEventListener('keydown', event => {
   const pieceLeft = { x: piece.position.x - 1, y: piece.position.y }
   const pieceRight = { x: piece.position.x + 1, y: piece.position.y }

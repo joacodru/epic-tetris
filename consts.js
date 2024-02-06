@@ -1,6 +1,8 @@
 export const PIXEL = 40
 export const BOARD_WIDTH = 10
 export const BOARD_HEIGHT = 20
+export const NEXT_PIECE_WIDTH = 6
+export const NEXT_PIECE_HEIGHT = 4
 
 export const piece = {
   position: { x: 2, y: 0 },

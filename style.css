@@ -39,6 +39,9 @@ section {
 
 #app {
   display: flex;
+  width: 50%;
+  height:80%; 
+  margin:0 auto;
 }
 
 #score-display {
@@ -59,3 +62,4 @@ canvas {
   border-color: red;
   border-width: 15px;
 }
+
