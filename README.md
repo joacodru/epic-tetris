@@ -24,7 +24,7 @@
   <p align="center">
     A Tetris game developed entirely on vanilla javascript.
     <br />
-    <a href="">View Demo</a>
+    <a href="http://joadruetta.com/">View Demo</a>
     ·
     <a href="">Report Bug</a>
     ·
