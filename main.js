@@ -147,6 +147,25 @@ function checkColission (movement) {
   })
 }
 
+function submitScore () {
+  if (score && playerName && lines) {
+    fetch('http://localhost:3000/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: playerName, score, lines, timePlayed: 12 })
+    })
+      .then(response => response.text())
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.error('Error:', error)
+      })
+  }
+}
+
 // Solidify piece
 function solidifyPiece () {
   piece.shape.forEach((row, y) => {
@@ -164,6 +183,7 @@ function solidifyPiece () {
 
   // Game over
   if (checkColission()) {
+    submitScore()
     window.alert('Game over!! Try again!')
     maxScore = Math.max(score, maxScore)
     score = 0
@@ -254,9 +274,22 @@ document.addEventListener('keydown', event => {
   }
 })
 
+const $startGameBtn = document.getElementById('startGameBtn')
+
 const $section = document.querySelector('section')
 
-$section.addEventListener('click', () => {
+let playerName = ''
+
+const $playerNameInput = document.getElementById('playerName')
+
+$startGameBtn.addEventListener('click', () => {
+  playerName = $playerNameInput.value.trim()
+
+  if (!playerName) {
+    window.alert('Please enter your name before starting the game.')
+    return
+  }
+
   getRandomPiece()
   update()
   $section.remove()

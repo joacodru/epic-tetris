@@ -2,8 +2,11 @@ const express = require('express')
 const mongoose = require('mongoose')
 const User = require('./models/user.model')
 const Game = require('./models/game.model')
+const cors = require('cors')
 const app = express()
 const port = 3000
+
+app.use(cors())
 
 const password = process.env.MONGODB_PASSWORD
 
@@ -51,7 +54,7 @@ app.post('/submit', async (req, res) => {
       let user = await User.findOne({ name: req.body.name })
 
       if (!user) {
-        user = await User.create(req.body.name)
+        user = await User.create(req.body)
       }
 
       const game = await Game.create({
