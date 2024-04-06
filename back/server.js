@@ -5,6 +5,8 @@ const Game = require('./models/game.model')
 const app = express()
 const port = 3000
 
+const password = process.env.MONGODB_PASSWORD
+
 app.use(express.json())
 
 app.get('/', (req, res) => {
@@ -72,7 +74,9 @@ app.post('/submit', async (req, res) => {
   }
 })
 
-mongoose.connect('mongodb+srv://admin:hT4FuuNYKMEfKmMX@epictetrisdb.gnfrfpv.mongodb.net/TetrisDB?retryWrites=true&w=majority&appName=EpicTetrisDB')
+const connectionString = `mongodb+srv://admin:${password}@epictetrisdb.gnfrfpv.mongodb.net/TetrisDB?retryWrites=true&w=majority&appName=EpicTetrisDB`
+
+mongoose.connect(connectionString)
   .then(() => {
     console.log('Connected to MongoDB')
     app.listen(port, () => {
