@@ -54,7 +54,6 @@ function getRandomPiece () {
 
 // points
 let score = 0
-let maxScore = 0
 let level = 0
 let lines = 0
 
@@ -185,7 +184,7 @@ function solidifyPiece () {
   if (checkColission()) {
     submitScore()
     window.alert('Game over!! Try again!')
-    maxScore = Math.max(score, maxScore)
+    getLeaderboard()
     score = 0
     level = 0
     lines = 0
@@ -219,7 +218,6 @@ function removeRows () {
   document.getElementById('score').textContent = score
   document.getElementById('lines').textContent = lines
   document.getElementById('level').textContent = level
-  document.getElementById('maxScore').textContent = maxScore
 }
 
 // rotate piece
@@ -274,6 +272,36 @@ document.addEventListener('keydown', event => {
   }
 })
 
+function displayLeaderboard (leaderboard) {
+  const leaderboardContainer = document.getElementById('leaderboard')
+  leaderboardContainer.innerHTML = '' // Clear previous leaderboard data
+  leaderboard.forEach(entry => {
+    const listItemName = document.createElement('a')
+    listItemName.textContent = `${entry.name}: `
+    leaderboardContainer.appendChild(listItemName)
+
+    const listItem = document.createElement('span')
+    listItem.textContent = `${entry.maxScore}`
+    leaderboardContainer.appendChild(listItem)
+
+    const lineBreak = document.createElement('br')
+    leaderboardContainer.appendChild(lineBreak)
+  })
+}
+
+async function getLeaderboard () {
+  try {
+    const response = await fetch('http://localhost:3000/leaderboard')
+    if (!response.ok) {
+      throw new Error('Failed to fetch leaderboard')
+    }
+    const leaderboard = await response.json()
+    displayLeaderboard(leaderboard)
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error)
+  }
+}
+
 const $startGameBtn = document.getElementById('startGameBtn')
 
 const $section = document.querySelector('section')
@@ -282,7 +310,7 @@ let playerName = ''
 
 const $playerNameInput = document.getElementById('playerName')
 
-$startGameBtn.addEventListener('click', () => {
+$startGameBtn.addEventListener('click', async () => {
   playerName = $playerNameInput.value.trim()
 
   if (!playerName) {
@@ -290,6 +318,7 @@ $startGameBtn.addEventListener('click', () => {
     return
   }
 
+  await getLeaderboard()
   getRandomPiece()
   update()
   $section.remove()
